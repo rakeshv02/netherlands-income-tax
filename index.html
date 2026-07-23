@@ -1,42 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Netherlands Income Tax Calculator 2025 — Box 1 & Heffingskorting | Tabutility</title>
+  <meta name="description" content="Calculate your Dutch take-home pay for 2025. Includes Box 1 income tax, general tax credit (heffingskorting) and labour tax credit (arbeidskorting)." />
+  <meta name="keywords" content="netherlands income tax calculator, dutch tax calculator, box 1 tax, heffingskorting, arbeidskorting, belasting 2025, take home pay netherlands" />
+  <link rel="canonical" href="https://netherlands-income-tax.tabutility.com/" />
+  <meta property="og:title" content="Netherlands Income Tax Calculator 2025" />
+  <meta property="og:description" content="Calculate Dutch take-home pay including Box 1 tax and tax credits for 2025." />
+  <meta property="og:type" content="website" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇳🇱</text></svg>" />
+  <meta name="robots" content="index, follow" />
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7039091592734005" crossorigin="anonymous"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-78VZWJ5B1W"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-78VZWJ5B1W');</script>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body style="margin:0;background:#f8faff;font-family:'Segoe UI',Arial,sans-serif">
+<div id="root"></div>
+<script type="text/babel">
+//<![CDATA[
+const { useState } = React;
 
-    <!-- ✏️ UPDATE THESE FOR EVERY NEW TOOL -->
-    <title>TOOL NAME — TOOL TAGLINE | Tabutility</title>
-    <meta name="description" content="TOOL DESCRIPTION. No sign-up, runs in your browser." />
-    <meta name="keywords" content="KEYWORD 1, KEYWORD 2, KEYWORD 3, free TOOL NAME" />
-    <link rel="canonical" href="https://SUBDOMAIN.tabutility.com/" />
-    <meta property="og:url" content="https://SUBDOMAIN.tabutility.com/" />
-    <meta property="og:title" content="TOOL NAME — TOOL TAGLINE" />
-    <meta property="og:description" content="TOOL DESCRIPTION. Free, no sign-up." />
-    <meta name="twitter:title" content="TOOL NAME — TOOL TAGLINE" />
-    <meta name="twitter:description" content="TOOL DESCRIPTION. Free, no sign-up." />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>EMOJI</text></svg>" />
-    <!-- ✏️ END OF SECTION TO UPDATE -->
+function calcNetherlands(gross) {
+  // Box 1 tax 2025
+  const band1Limit = 75518;
+  const rate1 = 0.3697;
+  const rate2 = 0.4950;
 
-    <!-- DO NOT CHANGE ANYTHING BELOW THIS LINE -->
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Tabutility" />
-    <meta name="twitter:card" content="summary" />
-    <meta name="robots" content="index, follow" />
+  let tax = 0;
+  if (gross <= band1Limit) {
+    tax = gross * rate1;
+  } else {
+    tax = band1Limit * rate1 + (gross - band1Limit) * rate2;
+  }
 
-    <!-- Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7039091592734005" crossorigin="anonymous"></script>
+  // Algemene heffingskorting (general tax credit) 2025
+  // Max €3,362, phases out above €24,812 at 6.095% rate, zero above €75,518
+  let heffingskorting = 0;
+  if (gross <= 24812) {
+    heffingskorting = 3362;
+  } else if (gross <= 75518) {
+    heffingskorting = Math.max(0, 3362 - (gross - 24812) * 0.06095);
+  } else {
+    heffingskorting = 0;
+  }
 
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-78VZWJ5B1W"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-78VZWJ5B1W');
-    </script>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+  // Arbeidskorting (labour tax credit) 2025
+  // Phases in up to €25,187, max €5,158, then phases out above €43,071
+  let arbeidskorting = 0;
+  if (gross <= 11491) {
+    arbeidskorting = gross * 0.08425;
+  } else if (gross <= 25187) {
+    arbeidskorting = 968 + (gross - 11491) * 0.31433;
+  } else if (gross <= 43071) {
+    arbeidskorting = 5158;
+  } else if (gross <= 124935) {
+    arbeidskorting = Math.max(0, 5158 - (gross - 43071) * 0.06510);
+  } else {
+    arbeidskorting = 0;
+  }
+
+  const totalCredits = heffingskorting + arbeidskorting;
+  const netTax = Math.max(0, tax - totalCredits);
+
+  // Employee social contributions included in Box 1 rate already (NL bundles them)
+  const takeHome = gross - netTax;
+
+  return { grossTax: tax, heffingskorting, arbeidskorting, totalCredits, netTax, takeHome };
+}
+
+function fmt(n) { return '€' + Math.round(n).toLocaleString('nl-NL'); }
+function pct(n, gross) { return gross > 0 ? (n / gross * 100).toFixed(1) + '%' : '0%'; }
+
+function Row({ label, value, gross, highlight, credit }) {
+  return (
+    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 0',borderBottom:'1px solid #f0f0f0'}}>
+      <span style={{fontSize:14,color:highlight?'#1a1a2e':credit?'#16a34a':'#6b7280',fontWeight:highlight?700:400}}>{label}</span>
+      <div style={{textAlign:'right'}}>
+        <span style={{fontSize:15,fontWeight:700,color:highlight?'#ea580c':credit?'#16a34a':'#1a1a2e'}}>{credit ? '−' : ''}{fmt(value)}</span>
+        <span style={{fontSize:12,color:'#9ca3af',marginLeft:8}}>{pct(value,gross)}</span>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [gross, setGross] = useState(65000);
+  const r = calcNetherlands(Number(gross) || 0);
+  const g = Number(gross) || 0;
+
+  return (
+    <div style={{maxWidth:520,margin:'0 auto',padding:'0 0 40px'}}>
+      <div style={{background:'#1a1a2e',padding:'12px 20px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+        <a href="https://tabutility.com" style={{color:'#a5b4fc',textDecoration:'none',fontSize:14}}>← All Tools</a>
+        <span style={{color:'#fff',fontWeight:700,fontSize:15}}>⚡ Tabutility</span>
+      </div>
+
+      <div style={{background:'linear-gradient(135deg,#ea580c,#c2410c)',padding:'28px 20px',textAlign:'center',color:'#fff'}}>
+        <div style={{fontSize:36,marginBottom:8}}>🇳🇱</div>
+        <h1 style={{margin:'0 0 6px',fontSize:22,fontWeight:900}}>Netherlands Income Tax Calculator</h1>
+        <p style={{margin:0,fontSize:13,opacity:0.85}}>Box 1 · Heffingskorting · Arbeidskorting — 2025</p>
+      </div>
+
+      <div style={{padding:'20px'}}>
+        <div style={{background:'#fff',borderRadius:14,padding:'20px',boxShadow:'0 2px 12px rgba(0,0,0,0.06)',marginBottom:16}}>
+          <label style={{fontSize:13,fontWeight:600,color:'#374151',display:'block',marginBottom:6}}>Annual Gross Salary (Bruto)</label>
+          <div style={{position:'relative'}}>
+            <span style={{position:'absolute',left:12,top:'50%',transform:'translateY(-50%)',color:'#6b7280',fontWeight:700}}>€</span>
+            <input type="number" value={gross} onChange={e=>setGross(e.target.value)}
+              style={{width:'100%',padding:'11px 12px 11px 28px',borderRadius:10,border:'2px solid #e5e7eb',fontSize:16,boxSizing:'border-box',outline:'none'}} />
+          </div>
+        </div>
+
+        <div style={{background:'#fff',borderRadius:14,padding:'20px',boxShadow:'0 2px 12px rgba(0,0,0,0.06)',marginBottom:16}}>
+          <div style={{fontSize:13,fontWeight:700,color:'#6b7280',marginBottom:4,textTransform:'uppercase',letterSpacing:0.5}}>Take-Home Pay (Netto)</div>
+          <div style={{fontSize:36,fontWeight:900,color:'#ea580c',marginBottom:4}}>{fmt(r.takeHome)}</div>
+          <div style={{fontSize:13,color:'#9ca3af'}}>per year &nbsp;·&nbsp; {fmt(r.takeHome/12)} / month</div>
+        </div>
+
+        <div style={{background:'#fff',borderRadius:14,padding:'20px',boxShadow:'0 2px 12px rgba(0,0,0,0.06)'}}>
+          <div style={{fontSize:13,fontWeight:700,color:'#374151',marginBottom:8}}>Breakdown</div>
+          <Row label="Gross Salary" value={g} gross={g} />
+          <Row label="Box 1 Tax (before credits)" value={r.grossTax} gross={g} />
+          <Row label="General Tax Credit (Heffingskorting)" value={r.heffingskorting} gross={g} credit />
+          <Row label="Labour Tax Credit (Arbeidskorting)" value={r.arbeidskorting} gross={g} credit />
+          <Row label="Net Income Tax" value={r.netTax} gross={g} />
+          <Row label="Net Take-Home" value={r.takeHome} gross={g} highlight />
+        </div>
+
+        <div style={{background:'#fff7ed',borderRadius:12,padding:'16px',marginTop:16,fontSize:13,color:'#c2410c',lineHeight:1.6}}>
+          <strong>2025 Box 1 rates:</strong> 36.97% up to €75,518 · 49.50% above €75,518. Tax credits reduce your bill: heffingskorting (max €3,362) and arbeidskorting (max €5,158) both phase out at higher incomes. Note: Box 1 rate includes social contributions.
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+//]]>
+</script>
+</body>
 </html>
