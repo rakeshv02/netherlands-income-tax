@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://netherlands-income-tax.tabutility.com/sitemap.xml
